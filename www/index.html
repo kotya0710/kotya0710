@@ -3,15 +3,20 @@
     <head></head>
     <body>
         <script>
-            var _compile_me=()=>{
+            var _build={}
+            function build(name) {
+                if(name in _build)
+                    return _build[name]
                 Object.assign(document.body, {
-                    innerText:"Need to `./compile.sh`",
+                    innerText:"Server must execute www/compile.sh",
+                    style:{
+                        color:Math.random()>0.5?'red':'blue',
+                    },
                 })
+                return null
             }
-            var _src_content=_compile_me
-            var index=_compile_me
         </script>
-        <script src="_src_content.js"></script>
+        <script src="build/src_content.js"></script>
         <script src="index.js"></script>
     </body>
 </html>

@@ -19,9 +19,11 @@ class build {
     throws IOException
     {
         System.out.println("Building...");
+        String buildname = "build";
+        String build = "./"+buildname+"/";
         String path = "./src/";
-        String name = "_src_content";
-        String data = "var "+name+"=()=>[\n";
+        String name = "src_content";
+        String data = "build."+name+"=[\n";
         String tail = "]\n";
         String list = ".keys=[";
         File directoryPath = new File(path);
@@ -31,12 +33,12 @@ class build {
             File file = new File(path+contents[i]);
             byte[] fc = Files.readAllBytes(file.toPath());
             data += "`" + new String(fc) + "`,\n";
-            tail += name + "['" + contents[i] + "']";
-            tail += "=" + name + "[" + i + "]\n";
+            tail += buildname + '.' + name + "['" + contents[i] + "']";
+            tail += "=" + buildname + '.' + name + "[" + i + "]\n";
             list += "'" + contents[i] + "',";
         }
-        data += tail + name + list + "]";
-        File file = new File(name+".js");
+        data += tail + buildname + '.' + name + list + "]";
+        File file = new File(build+name+".js");
         FileOutputStream fos = new FileOutputStream(file);
         BufferedOutputStream bos =
             new BufferedOutputStream(fos);

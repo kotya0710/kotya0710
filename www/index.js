@@ -2,7 +2,7 @@
 // match don't return groups if /g set
 window.onload = function () {
     document.body.innerHTML = ""
-    let text = _src_content['fibonacci.c']
+    let text = build('src_content')['fibonacci.c']
     
     let _c_rules = c_rules()
     let os=[]
@@ -27,6 +27,7 @@ window.onload = function () {
 }
 
 function c_rules() {
+    // isolate brackets first
     return [
         [
             'typedef',
@@ -39,18 +40,27 @@ function c_rules() {
             'type', 'name', 'args'
         ],
         [
-            'open figure brace',
-            /^{\s*/,
-            null
-        ],
-        [
             'подпроцедура или тип и процедура',
             '[a-zA-Z0-9_\s]+(.*)\s*;',
             'a'
+        ],
+        [
+            'comm',
+            [ /\/\/.*\n/ ],
+            null
+        ],
+        [
+            'if',
+        [ /if\s*\(\s*(.*)\s*\)/ ],
+            'if_body'
         ]
     ]
         .map(([a, b, ...x]) => typeof b == 'string' ?
             [a, new RegExp('^' + b + '\\s*'), ...x] :
+            [a, b, ...x])
+
+        .map(([a, b, ...x]) => b instanceof Array ?
+            [a, new RegExp('^' + String(b[0]).slice(1,-1) + '\\s*'), ...x] :
             [a, b, ...x])
 }
 
@@ -65,6 +75,8 @@ function parse(text, ps) {
 function parse_(text, _name, re, ...a) {
     if(typeof re == 'string')
         poop_err('re cannot be string')
+    if(re instanceof Array)
+        poop_err('re cannot be Array')
     let m = text.match(re)
     if(!m)
         return null
