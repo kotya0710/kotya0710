@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+<groupId>kotya0710.com.vk</groupId>
+<artifactId>kotya0710.com.github</artifactId>
+<version>1.0-SNAPSHOT</version>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub kotya0710 Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/kotya0710/kotya0710</url>
+    </repository>
+  </distributionManagement>
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+        <version>3.1.1</version>
+      </extension>
+    </extensions>
+  </build>
+</project>

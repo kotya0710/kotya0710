@@ -1,0 +1,13 @@
+<project>
+<modelVersion>4.0.0</modelVersion>
+<groupId>kotya0710.com.github</groupId>
+<artifactId>kotya0710.com.vk</artifactId>
+<version>1.0.0</version>
+<distributionManagement>
+   <repository>
+     <id>github</id>
+     <name>GitHub kotya0710 Apache Maven Packages</name>
+     <url>https://maven.pkg.github.com/kotya0710/kotya0710</url>
+   </repository>
+</distributionManagement>
+</project>
