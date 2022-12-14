@@ -1,7 +1,8 @@
-class resources_test {
+class resources {
     public static void main(String []args)
     {
-        System.out.println("Resourses tested OK!");
+        String data="Resourses tested OK!";
+        System.out.println(data);
         java.io.File file = new java.io.File("./resourses-test");
         try(FileOutputStream fos = new FileOutputStream(file);
                 BufferedOutputStream bos = new BufferedOutputStream(fos)) {
