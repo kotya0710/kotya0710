@@ -1,3 +1,4 @@
 target
 *.class
 run-mvn-output.txt
+www/build
