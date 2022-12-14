@@ -19,8 +19,13 @@ window.onload = function () {
         text = text.slice(o._len)
     }
 
+    let _=document.createElement('div')
+    _.append(...os.map((o,i) => display(`[${i}] `+o._name+
+    ' `font-size:0.49em` '+JSON.stringify(o))))
     poop(
-        os.map((o,i) => `[${i}]`+JSON.stringify(o)).join('\n')
+        //os.map((o,i) => `[${i}]`+
+        //JSON.stringify(o)).join('\n')
+        _
     )
 
     poop(text, { color: 'hotpink' })
@@ -29,6 +34,37 @@ window.onload = function () {
     {
         poop('Program ready!', { color: 'green' })
     }
+}
+
+function display(a)
+{
+    // string -> div(string)
+    if(typeof a == 'string')
+    {
+        let ai=a.indexOf('`')
+        if(ai<=0)
+        {
+            let d=document.createElement('div')
+            d.innerText=(a)
+            return d
+        }
+        let bi=a.indexOf('`',ai+1)
+        if(ai>=0 && bi<0)
+        {
+            throw 'Unclosed `'
+        }
+        let d=document.createElement('div')
+        d.innerText=a.slice(0,ai)
+        let d2=document.createElement('span')
+        d2.innerText=a.slice(bi+1)
+        let b=(a.slice(ai+1,bi)).match(/(.*)\:(.*)/)
+        if(!b)
+            throw 'Not expressed'
+        d2.style[b[1]] = b[2]
+        d.append(d2)
+        return d
+    }
+    throw 'What to display?'
 }
 
 function is_expression(expr)
@@ -242,7 +278,12 @@ function poop_err(t = 'poop', s = {}, ...a)
 function poop(text = 'poop', style = {}) {
     console.log(text)
     let poop = document.createElement('div')
-    poop.innerText = JSON.stringify(text)
+    if(text && text.length)
+        poop.innerText = text
+    else if(text.classList instanceof DOMTokenList)
+        document.body.append(text)
+    else
+        poop.innerText = JSON.stringify(text)
     poop.style.color = style.color || 'black'
     poop.style.background = style.background || 'white'
     document.body.append(poop)
