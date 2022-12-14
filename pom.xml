@@ -1,7 +1,7 @@
 <project>
 <modelVersion>4.0.0</modelVersion>
-<groupId>kotya0710.com.github</groupId>
-<artifactId>kotya0710.com.vk</artifactId>
+<groupId>kotya0710.com.vk</groupId>
+<artifactId>kotya0710.com.github</artifactId>
 <version>1.0.0</version>
 <distributionManagement>
    <repository>
