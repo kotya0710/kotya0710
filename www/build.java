@@ -21,7 +21,7 @@ class build {
         System.out.println("Building...");
         String path = "./src/";
         String name = "_src_content";
-        String data = "var "+name+"=[\n";
+        String data = "var "+name+"=()=>[\n";
         String tail = "]\n";
         String list = ".keys=[";
         File directoryPath = new File(path);
