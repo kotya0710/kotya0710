@@ -24,25 +24,104 @@ window.onload = function () {
     )
 
     poop(text, { color: 'hotpink' })
+
+    if(!text.length)
+    {
+        poop('Program ready!', { color: 'green' })
+    }
+}
+
+function is_expression(expr)
+{
+    // returns null if expr is not an expression
+    // returns [a,o,b,o,...o,b] owervise
+    
+    return true
+}
+
+function exec_expression(a,o,b)
+{
+    return {
+        expression_true:expression_true([a+o+b]),
+        a_is_expression:is_expression(a),
+        b_is_expression:is_expression(b),
+
+    }
+}
+
+function function_call(type, name, args){
+    //poop(type)
+    if(type[0]=='return')
+    {
+        let expr = type[1] + '(' + type[2] + ')'
+        if((expr=is_expression(expr)))
+        {
+            let a=expr[0]
+            let i0=MUST_BE_INFINITY
+            let i=0
+            for(;;)
+            {
+                if(i0<Infinity)
+                {
+                    if(i0--<=0)
+                    {
+                        return '<function call :: return with expression like infinite?>'
+                        break;
+                    }
+                }
+                let o=expr[i+=1]
+                let b=expr[i+=1]
+                if(o == b) // xor test
+                {
+                    i-=2;
+                    break;
+                }
+                //exec a o b
+                a=exec_expression(a,o,b);
+                if(expr.length <= i)
+                    break
+            }
+            let o=expr[i+=1]
+            let b=expr[i+=1]
+            return exec_expression(a,o,b);
+        }
+        else
+        {
+            return '<function call :: return with expression like no>'
+        }
+    }
 }
 
 function c_rules() {
     // isolate brackets first
-    return [
+    return [ // sorted by greedyness
         [
             'typedef',
             /^typedef\s+(.*)\s+([a-zA-Z0-9_]+)\s*;\s*/,
             'type', 'alias'
         ],
         [
-            'function',
+            'function block',
+            /^([a-zA-Z0-9_\s]+)\s+([a-zA-Z0-9_]+)\s*\((.*)\)\s*\{\s*/,
+            'type', 'name', 'args'
+        ],
+        [
+            'function call',
+            /^([a-zA-Z0-9_\s]+)\s+([a-zA-Z0-9_]+)\s*\((.*)\)\s*;\s*/,
+            function_call,
+            'fc',//'Description: <error> xor exec_expression like in c--'
+
+        ],
+        [
+            'function WHAT',
             /^([a-zA-Z0-9_\s]+)\s+([a-zA-Z0-9_]+)\s*\((.*)\)\s*/,
             'type', 'name', 'args'
         ],
         [
-            'подпроцедура или тип и процедура',
+            'function call extended',//'подпроцедура или тип и процедура',
             '[a-zA-Z0-9_\s]+(.*)\s*;',
-            'a'
+            function_call,
+            'fce'
         ],
         [
             'comm',
@@ -50,9 +129,21 @@ function c_rules() {
             null
         ],
         [
+            'if block',
+            [ /if\s*\(\s*(.*)\s*\)\s*\{/ ],
+            (if_body)=>{return expression_true(if_body)},
+            'true'
+        ],
+        [
             'if',
-        [ /if\s*\(\s*(.*)\s*\)/ ],
-            'if_body'
+            [ /if\s*\(\s*(.*)\s*\)/ ],
+            (if_body)=>{return expression_true(if_body)},
+            'true'
+        ],
+        [
+            'block end',
+            [ /\}/ ],
+            null
         ]
     ]
         .map(([a, b, ...x]) => typeof b == 'string' ?
@@ -62,6 +153,41 @@ function c_rules() {
         .map(([a, b, ...x]) => b instanceof Array ?
             [a, new RegExp('^' + String(b[0]).slice(1,-1) + '\\s*'), ...x] :
             [a, b, ...x])
+        
+        .map(([a, ...x]) => a instanceof Function ?
+            [a, ...x] :
+            [a, ...x])
+}
+
+function expression_true([expression])
+{
+    let head1=/^/
+    
+    let body1=/\s*([a-zA-Z0-9_]+)/
+
+    let head2=/\s*([^a-zA-Z0-9_]+)/
+
+    // body1
+
+    let tail1=/\s*/
+
+    let ex=new RegExp([head1,body1,head2,body1,tail1].map(e=>String).join(''))
+    ex=/^\s*([a-zA-Z0-9_]+)\s*([^a-zA-Z0-9_]+)\s*([a-zA-Z0-9_]+)\s*/
+    //<--- not same lol?
+    //poop(expression)
+    if(typeof expression != 'string')
+        return false
+    ex=expression.match(ex)
+    if(!ex)
+        //throw 'Very Bad expression'
+        return false // Expression is not true if it is not an axpression is my opinion
+    if(ex.length<1+3)
+        throw 'Expression too little'
+    let [a,op,b]=ex.slice(1)
+    if(op=='>=')return parseInt(a)>=parseInt(b)
+
+    let bool = true
+    return bool
 }
 
 function parse(text, ps) {
@@ -77,10 +203,23 @@ function parse_(text, _name, re, ...a) {
         poop_err('re cannot be string')
     if(re instanceof Array)
         poop_err('re cannot be Array')
+    let cb=null,cbname='_ooups'
+    if(a[0] instanceof Function)
+    {
+        cb=a[0]
+        cbname=a[1]
+    }
     let m = text.match(re)
     if(!m)
         return null
     let o = { _name, _len: m[0].length, _str: m[0] }
+    if(cb)
+        return (()=>{
+            // python where are you
+            let o2={ ...o }
+            o2[a[1]]=cb(m.slice(1))
+            return o2
+        })()
     if(m.length - 1 > a.length)
         poop_err('You want too less arguments')
     if(a.length == 1 && a[0] === null)
@@ -103,7 +242,7 @@ function poop_err(t = 'poop', s = {}, ...a)
 function poop(text = 'poop', style = {}) {
     console.log(text)
     let poop = document.createElement('div')
-    poop.innerText = text
+    poop.innerText = JSON.stringify(text)
     poop.style.color = style.color || 'black'
     poop.style.background = style.background || 'white'
     document.body.append(poop)
